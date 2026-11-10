@@ -149,7 +149,7 @@ a.lnk{color:inherit;font-weight:600;text-underline-offset:3px}
 
 <script>
 /* ============ DATOS ============ */
-const TABS=[['hoy','Hoy','Heute','Tu panel de salidas del día'],['reformular','Reformular','Umformulieren','Una frase, hasta tres maneras de decirla'],['vocabulario','Vocabulario','Wortschatz','60 palabras para trabajo, pareja, viajes y sofá'],['oido','Oído','Hören','Dictados y alemán de la calle'],['canciones','Canciones','Lieder','Cada canción, una lección'],['gramatica','Gramática','Grammatik','Cómo se monta una frase alemana'],['orden','Orden','Wortstellung','Toca las palabras y construye la frase']];
+const TABS=[['hoy','Hoy','Heute','Tu panel de salidas del día'],['reformular','Reformular','Umformulieren','Una frase, hasta tres maneras de decirla'],['vocabulario','Vocabulario','Wortschatz','Las palabras de tu libreta y 60 más'],['oido','Oído','Hören','Dictados y alemán de la calle'],['canciones','Canciones','Lieder','Cada canción, una lección'],['gramatica','Gramática','Grammatik','Cómo se monta una frase alemana'],['orden','Orden','Wortstellung','Toca las palabras y construye la frase']];
 
 const VOCAB=[
 ["die Besprechung","la reunión","Die Besprechung dauert länger als ein Rammstein-Konzert.","La reunión dura más que un concierto de Rammstein."],
@@ -212,6 +212,104 @@ const VOCAB=[
 ["sofort","enseguida","Ich komme sofort!","¡Voy enseguida!"],
 ["noch nicht","todavía no","Hast du die Folge schon gesehen? – Noch nicht!","¿Ya has visto el episodio? – ¡Todavía no!"],
 ["genau","exacto","Genau! Das meine ich.","¡Exacto! A eso me refiero."]];
+
+// Palabras de la libreta del alumno: entran antes que las demás en la cola de tarjetas.
+const HEFT=[
+["ein bisschen","un poco","Ich spreche ein bisschen Deutsch und sehr viel Spanisch.","Hablo un poco de alemán y muchísimo español."],
+["gern","con gusto (verbo + gern = me gusta…)","Ich höre gern Rammstein.","Me gusta escuchar Rammstein."],
+["sehr gern","con mucho gusto, me gusta mucho","Ich gehe sehr gern ins Kino.","Me gusta mucho ir al cine."],
+["leider nicht","por desgracia, no","Hast du Zeit? – Leider nicht.","¿Tienes tiempo? – Por desgracia, no."],
+["der Krankenpfleger / die Krankenschwester","el enfermero / la enfermera","Die Krankenschwester arbeitet im Krankenhaus.","La enfermera trabaja en el hospital."],
+["das Handy","el móvil","Wo ist mein Handy? – In deiner Hand.","¿Dónde está mi móvil? – En tu mano."],
+["der Freund / die Freundin","el amigo / la amiga (también novio, novia)","Meine Freundin liebt Serien.","A mi novia le encantan las series."],
+["die Tante","la tía","Meine Tante kocht sehr gut.","Mi tía cocina muy bien."],
+["suchen","buscar","Ich suche mein Handy. Schon wieder.","Busco mi móvil. Otra vez."],
+["gehen","ir (a pie)","Wir gehen heute ins Theater.","Hoy vamos al teatro."],
+["das Theater","el teatro","Das Theater ist heute geschlossen.","El teatro hoy está cerrado."],
+["hören","escuchar, oír","Ich höre Musik im Bus.","Escucho música en el autobús."],
+["reisen","viajar","Ich reise gern nach Deutschland.","Me gusta viajar a Alemania."],
+["kochen","cocinar","Ich koche heute, du spülst.","Hoy cocino yo; tú friegas."],
+["hassen","odiar","Ich hasse Montage.","Odio los lunes."],
+["lieben","amar, encantar","Ich liebe dich. Und Pizza.","Te quiero. Y la pizza también."],
+["der Friseur / die Friseurin","el peluquero / la peluquera","Meine Friseurin redet sehr viel.","Mi peluquera habla muchísimo."],
+["die Stadt (plural: die Städte)","la ciudad","Berlin und Hamburg sind große Städte.","Berlín y Hamburgo son ciudades grandes."],
+["Sag mal","oye, dime","Sag mal, hast du heute Zeit?","Oye, ¿tienes tiempo hoy?"],
+["der Vorname","el nombre de pila","Wie ist Ihr Vorname?","¿Cuál es su nombre?"],
+["der Nachname","el apellido","Mein Nachname ist für Deutsche sehr schwer.","Mi apellido es muy difícil para los alemanes."],
+["geschieden","divorciado","Mein Onkel ist geschieden.","Mi tío está divorciado."],
+["verheiratet","casado","Sind Sie verheiratet?","¿Está usted casado?"],
+["ledig","soltero","Ich bin ledig und habe eine Katze.","Estoy soltero y tengo un gato."],
+["möchten","querer, en educado (ich möchte = quisiera)","Ich möchte gern einen Kaffee.","Quisiera un café."],
+["lieber","mejor (ich möchte lieber = preferiría)","Ich möchte lieber Tee.","Preferiría té."],
+["krank","enfermo","Ich bin krank und bleibe im Bett.","Estoy enfermo y me quedo en la cama."],
+["Viel Spaß!","¡Que lo pases bien!","Viel Spaß beim Konzert!","¡Que lo pases bien en el concierto!"],
+["der Mitschüler / die Mitschülerin","el compañero / la compañera de clase","Meine Mitschülerin kommt aus Italien.","Mi compañera de clase es de Italia."],
+["arbeiten","trabajar","Er arbeitet zu viel.","Él trabaja demasiado."],
+["der Rentner / die Rentnerin","el jubilado / la jubilada","Mein Vater ist Rentner und reist viel.","Mi padre está jubilado y viaja mucho."],
+["das Krankenhaus","el hospital","Das Krankenhaus ist nicht weit.","El hospital no está lejos."],
+["Gleichfalls!","¡Igualmente!","Schönes Wochenende! – Danke, gleichfalls!","¡Buen finde! – ¡Gracias, igualmente!"],
+["die Zahl (plural: die Zahlen)","el número","Deutsche Zahlen sind verrückt: einundzwanzig!","Los números alemanes están locos: ¡«uno y veinte»!"],
+["das Obst","la fruta","Ich esse jeden Tag Obst.","Como fruta cada día."],
+["das Gemüse","la verdura","Gemüse ist gesund, Pommes leider nicht.","La verdura es sana; las patatas fritas, por desgracia, no."],
+["das Ei (plural: die Eier)","el huevo","Ich brauche vier Eier für die Tortilla.","Necesito cuatro huevos para la tortilla."],
+["die Butter","la mantequilla","Die Deutschen essen Brot mit Butter.","Los alemanes comen pan con mantequilla."],
+["das Brot","el pan","Deutsches Brot ist sehr gut.","El pan alemán es muy bueno."],
+["die Zwiebel","la cebolla","Tortilla mit oder ohne Zwiebel? Mit!","¿Tortilla con o sin cebolla? ¡Con!"],
+["das Brötchen","el panecillo","Zum Frühstück esse ich ein Brötchen.","Para desayunar me como un panecillo."],
+["kaufen","comprar","Ich kaufe Brot und Käse.","Compro pan y queso."],
+["der Pfeffer","la pimienta","Salz und Pfeffer, bitte.","Sal y pimienta, por favor."],
+["die Petersilie","el perejil","Ich brauche Petersilie für die Soße.","Necesito perejil para la salsa."],
+["trinken","beber","Was möchtest du trinken?","¿Qué quieres beber?"],
+["das Getränk (plural: die Getränke)","la bebida","Die Getränke sind im Kühlschrank.","Las bebidas están en la nevera."],
+["das Fleisch","la carne","Ich esse kein Fleisch.","No como carne."],
+["teuer","caro","Das Konzertticket ist sehr teuer.","La entrada del concierto es muy cara."],
+["billig","barato","Das Bier ist hier billig.","Aquí la cerveza es barata."],
+["mit","con","Einen Kaffee mit Milch, bitte.","Un café con leche, por favor."],
+["ohne","sin","Ohne Kaffee kann ich nicht arbeiten.","Sin café no puedo trabajar."],
+["nie","nunca","Ich bin nie pünktlich, der Zug auch nicht.","Nunca soy puntual; el tren tampoco."],
+["von … bis","de… a, desde… hasta","Ich arbeite von Montag bis Freitag.","Trabajo de lunes a viernes."],
+["jeden Tag","cada día","Ich lerne jeden Tag zehn Minuten Deutsch.","Estudio alemán diez minutos cada día."],
+["finden","encontrar; parecer, opinar","Ich finde den Film super.","La peli me parece genial."],
+["der Gast (plural: die Gäste)","el invitado; el cliente de un bar u hotel","Heute Abend kommen Gäste.","Esta noche vienen invitados."],
+["das Tier (plural: die Tiere)","el animal","Meine Freundin liebt Tiere.","A mi novia le encantan los animales."],
+["nur","solo, nada más","Ich habe nur fünf Euro.","Solo tengo cinco euros."],
+["zeigen","mostrar, enseñar (algo a alguien)","Kannst du mir das Foto zeigen?","¿Me puedes enseñar la foto?"],
+["die Pommes","las patatas fritas","Pommes mit Ketchup oder Mayo?","¿Patatas con kétchup o mayonesa?"],
+["die Nachricht","el mensaje, la noticia","Ich schreibe dir eine Nachricht.","Te escribo un mensaje."],
+["der Tag","el día","Der Tag war lang.","El día ha sido largo."],
+["die Woche","la semana","Diese Woche habe ich viel Arbeit.","Esta semana tengo mucho trabajo."],
+["das Mal","la vez","Ich sehe den Film zum dritten Mal.","Veo la peli por tercera vez."],
+["jeder / jede / jedes","cada","Jede Woche gucken wir eine neue Serie.","Cada semana vemos una serie nueva."],
+["noch ein / noch eine","otro / otra más","Noch ein Bier, bitte!","¡Otra cerveza, por favor!"],
+["weil","porque (manda el verbo al final)","Ich bleibe zu Hause, weil ich krank bin.","Me quedo en casa porque estoy enfermo."],
+["gesund","sano, saludable","Obst ist gesund.","La fruta es sana."],
+["die Lieblingsfarbe","el color favorito","Meine Lieblingsfarbe ist Schwarz.","Mi color favorito es el negro."],
+["das Erdbeereis","el helado de fresa","Ein Erdbeereis, bitte!","¡Un helado de fresa, por favor!"],
+["die Birne","la pera","Die Birne ist süß.","La pera está dulce."],
+["die Traube (plural: die Trauben)","la uva","An Silvester essen Spanier zwölf Trauben.","En Nochevieja los españoles comen doce uvas."],
+["die Avocado","el aguacate","Die Avocado ist noch nicht reif.","El aguacate todavía no está maduro."],
+["spät","tarde","Es ist spät, aber die Folge ist spannend.","Es tarde, pero el episodio está emocionante."],
+["dich","te, a ti","Ich sehe dich morgen.","Te veo mañana."],
+["mir","me, a mí","Kannst du mir helfen?","¿Me puedes ayudar?"],
+["die Umfrage","la encuesta","Wir machen eine Umfrage im Kurs.","Hacemos una encuesta en clase."],
+["das Frühstück","el desayuno","Das Frühstück ist um acht Uhr.","El desayuno es a las ocho."],
+["zum Essen","para comer","Was gibt es heute zum Essen?","¿Qué hay hoy para comer?"],
+["denn","pues, entonces (suaviza las preguntas)","Was machst du denn hier?","¿Y tú qué haces aquí?"],
+["schmecken","saber bien, gustar (solo comida y bebida)","Die Suppe schmeckt mir sehr gut.","La sopa me gusta mucho."],
+["zum Beispiel","por ejemplo","Ich mag deutsche Musik, zum Beispiel Rammstein.","Me gusta la música alemana, por ejemplo Rammstein."],
+["Zahlen Sie zusammen oder getrennt?","¿Pagan juntos o por separado?","Zahlen Sie zusammen oder getrennt? – Getrennt, bitte.","¿Pagan juntos o por separado? – Por separado, por favor."],
+["Zahlen Sie bar oder mit Karte?","¿Paga en efectivo o con tarjeta?","Zahlen Sie bar oder mit Karte? – Mit Karte, bitte.","¿Paga en efectivo o con tarjeta? – Con tarjeta, por favor."],
+["Guten Appetit!","¡Buen provecho!","Das Essen ist fertig. Guten Appetit!","La comida está lista. ¡Buen provecho!"],
+["der Witz","el chiste, la broma","Der Witz ist auf Deutsch nicht lustig.","El chiste en alemán no tiene gracia."],
+["zu zweit","en pareja, de dos en dos","Wir machen die Übung zu zweit.","Hacemos el ejercicio en pareja."],
+["das Stück","la unidad, el trozo","Ein Stück Kuchen, bitte.","Un trozo de tarta, por favor."],
+["das Angebot","la oferta","Die Tomaten sind heute im Angebot.","Los tomates hoy están de oferta."],
+["für","para","Das Geschenk ist für dich.","El regalo es para ti."],
+["wenig","poco","Ich habe wenig Zeit.","Tengo poco tiempo."],
+["schlafen","dormir","Am Sonntag schlafe ich bis elf.","El domingo duermo hasta las once."],
+["Sonst noch etwas?","¿Algo más?","Sonst noch etwas? – Nein, danke, das ist alles.","¿Algo más? – No, gracias, eso es todo."],
+["es gibt","hay","Heute gibt es Pizza.","Hoy hay pizza."],
+["wichtig","importante","Der Termin ist sehr wichtig.","La cita es muy importante."]];
 
 const RTOP={orden:'Orden de palabras',conj:'Conjunciones',perfekt:'Perfekt (pasado)',modal:'Verbos modales',neg:'Negación',preg:'Preguntas',reto:'Reto: pasiva'};
 const WHY={orden:'El verbo conjugado va siempre en segunda posición. Si empiezas por el tiempo o el lugar, el sujeto pasa detrás del verbo.',
@@ -477,7 +575,7 @@ V.reformular=()=>{
 };
 
 /* ---- U3 Vocabulario ---- */
-const words=()=>VOCAB.map(v=>({de:v[0],es:v[1],ex:v[2],exEs:v[3]})).concat(S.my);
+const words=()=>HEFT.concat(VOCAB).map(v=>({de:v[0],es:v[1],ex:v[2],exEs:v[3]})).concat(S.my);
 function queue(){const t=day(),w=words(),left=Math.max(0,12-(today().k.n||0));
   return w.filter(x=>S.cards[x.de]?.b>0&&S.cards[x.de].d<=t).concat(w.filter(x=>!S.cards[x.de]?.b).slice(0,left))}
 function grade(w,ok){const c=S.cards[w.de]||{b:0};if(!c.b){const d=S.days[day()]=S.days[day()]||{p:0,k:{}};d.k.n=(d.k.n||0)+1}
