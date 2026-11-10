@@ -617,7 +617,7 @@ if(SS){pickV();speechSynthesis.onvoiceschanged=pickV}
 function say(t,rate){
   if(SS&&(voice||!ttsCap)){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='de-DE';if(voice)u.voice=voice;u.rate=rate;speechSynthesis.speak(u)}
   else if(ttsCap)ttsCap.speak(t,{language:'de',rate:Math.max(.7,rate)}).catch(()=>toast('El audio no está disponible en este dispositivo.'));
-  else toast('Este navegador no tiene voz en alemán.');
+  else toast('Aquí no hay voz. Abre la página en Chrome o Safari (menú ⋮ → abrir en el navegador) para oír el audio.');
 }
 const au=t=>`<span class="au"><button data-a="say" data-t="${esc(t)}" data-r="0.95" aria-label="Escuchar">▶ Oír</button><button data-a="say" data-t="${esc(t)}" data-r="0.6">Más despacio</button></span>`;
 const uml=()=>`<span class="uml row" aria-label="Letras alemanas">${['ä','ö','ü','ß'].map(c=>`<button type="button" data-a="uml" data-c="${c}" aria-label="Insertar ${c}">${c}</button>`).join('')}</span>`;
